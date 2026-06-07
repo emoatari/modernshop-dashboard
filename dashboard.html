@@ -1,0 +1,1338 @@
+<!doctype html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Admin Dashboard | ModernShop</title>
+
+        <!-- Bootstrap 5.3.8 CSS -->
+        <link rel="stylesheet" href="Assets/css/bootstrap.min.css" />
+        <link rel="stylesheet" href="Assets/css/bootstrap-icons.min.css" />
+
+        <!-- Chart.js CDN -->
+        <!-- Chart.js Local -->
+        <script src="Assets/js/chart.umd.min.js"></script>
+
+        <style>
+            * {
+                margin: 0;
+                padding: 0;
+                box-sizing: border-box;
+            }
+            body {
+                background-color: #f0f2f5;
+                font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+            }
+
+            /* ========== SIDEBAR STYLES ========== */
+            .sidebar {
+                position: fixed;
+                top: 0;
+                left: 0;
+                height: 100%;
+                width: 260px;
+                background: linear-gradient(135deg, #1e2a3a 0%, #0f172a 100%);
+                color: white;
+                transition: all 0.3s;
+                z-index: 1000;
+                box-shadow: 2px 0 10px rgba(0, 0, 0, 0.1);
+            }
+
+            .sidebar-header {
+                padding: 20px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            }
+
+            .sidebar-header h4 {
+                margin: 0;
+                font-size: 1.3rem;
+            }
+
+            .sidebar-header small {
+                font-size: 0.7rem;
+                opacity: 0.7;
+            }
+
+            .sidebar .nav-link {
+                color: rgba(255, 255, 255, 0.7);
+                padding: 12px 20px;
+                margin: 5px 10px;
+                border-radius: 10px;
+                transition: all 0.3s;
+            }
+
+            .sidebar .nav-link:hover,
+            .sidebar .nav-link.active {
+                color: white;
+                background: rgba(255, 255, 255, 0.1);
+            }
+
+            .sidebar .nav-link i {
+                margin-right: 12px;
+                font-size: 1.2rem;
+            }
+
+            /* ========== MAIN CONTENT ========== */
+            .main-content {
+                margin-left: 260px;
+                padding: 20px;
+                transition: all 0.3s;
+            }
+
+            /* ========== STATS CARDS ========== */
+            .stat-card {
+                background: white;
+                border-radius: 15px;
+                padding: 20px;
+                box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+                transition: transform 0.3s;
+                border: none;
+            }
+
+            .stat-card:hover {
+                transform: translateY(-5px);
+            }
+
+            .stat-icon {
+                width: 50px;
+                height: 50px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                font-size: 1.8rem;
+            }
+
+            /* ========== RESPONSIVE ========== */
+            @media (max-width: 768px) {
+                .sidebar {
+                    margin-left: -260px;
+                }
+                .sidebar.active {
+                    margin-left: 0;
+                }
+                .main-content {
+                    margin-left: 0;
+                }
+                .menu-toggle {
+                    display: block;
+                }
+            }
+
+            .menu-toggle {
+                display: none;
+                position: fixed;
+                top: 15px;
+                left: 15px;
+                z-index: 1001;
+                background: #1e2a3a;
+                color: white;
+                border: none;
+                border-radius: 8px;
+                padding: 8px 12px;
+                cursor: pointer;
+            }
+
+            @media (min-width: 769px) {
+                .menu-toggle {
+                    display: none;
+                }
+            }
+            /* ========== ACTIVITY SECTION FIX ========== */
+            .activity-icon {
+                width: 32px;
+                height: 32px;
+                display: inline-flex;
+                align-items: center;
+                justify-content: center;
+                border-radius: 50%;
+                flex-shrink: 0;
+            }
+
+            .activity-icon i {
+                font-size: 0.9rem;
+            }
+
+            .timeline-item {
+                display: flex;
+                gap: 12px;
+                margin-bottom: 20px;
+            }
+
+            .timeline-item:last-child {
+                margin-bottom: 0;
+            }
+
+            .timeline-content {
+                flex: 1;
+            }
+            /* ========== PRODUCT TABS FIX ========== */
+            .product-tab-item {
+                transition: all 0.3s;
+                border: 1px solid #e9ecef;
+                border-radius: 10px;
+                padding: 15px;
+                text-align: center;
+                height: 100%;
+                background: white;
+            }
+
+            .product-tab-item:hover {
+                transform: translateY(-3px);
+                box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+                border-color: #0d6efd;
+            }
+
+            .product-tab-img {
+                width: 80px;
+                height: 80px;
+                object-fit: cover;
+                border-radius: 10px;
+                margin-bottom: 10px;
+            }
+
+            .product-tab-title {
+                font-size: 0.9rem;
+                font-weight: 500;
+                margin-bottom: 5px;
+            }
+
+            .product-tab-sold {
+                font-size: 0.75rem;
+                color: #6c757d;
+            }
+        </style>
+    </head>
+    <body>
+        <button class="menu-toggle" id="menu-toggle">
+            <span class="bi-list fs-4"></span>
+        </button>
+        <!-- start sidebar -->
+        <div class="sidebar" id="sidebar">
+            <div class="sidebar-header text-center">
+                <h4 class="mb-2">ModernShop</h4>
+                <span>Admin Dashboard</span>
+            </div>
+            <ul class="nav flex-column mt-3">
+                <li class="nav-item">
+                    <a href="#" class="nav-link active">
+                        <i class="bi-speedometer2"></i>Dashboard
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="bi bi-cart"></i>Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="bi bi-box-seam"></i>Products
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="bi bi-people"></i>Customers
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="bi bi-graph-up"></i>Analytics
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a href="#" class="nav-link">
+                        <i class="bi bi-gear"></i>Settings
+                    </a>
+                </li>
+                <li class="nav-item mt-5">
+                    <a href="index.html" class="nav-link text-danger">
+                        <i class="bi bi-box-arrow-right"></i>Logout
+                    </a>
+                </li>
+            </ul>
+        </div>
+        <!-- end sidebar -->
+        <!-- start main content -->
+        <div class="main-content">
+            <!-- Top Navbar -->
+            <nav class="navbar bg-white rounded-3 shadow-sm mb-4 p-3">
+                <div>
+                    <h5 class="mb-0">Welcome back, Admin!</h5>
+                    <small class="text-muted"
+                        >Here's what's happening today</small
+                    >
+                </div>
+                <div class="d-flex align-items-center">
+                    <button
+                        class="btn btn-outline-secondary position-relative me-3"
+                    >
+                        <i class="bi bi-bell"></i>
+                        <span
+                            class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger"
+                            >3</span
+                        >
+                    </button>
+                    <div class="dropdown">
+                        <button
+                            class="btn btn-link text-bg-dark text-decoration-none dropdown-toggle d-flex align-items-center"
+                            data-bs-toggle="dropdown"
+                        >
+                            <img
+                                src=""
+                                alt=""
+                                width="35"
+                                class="rounded-circle me2"
+                            />
+                            <span>John Doe</span>
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                            <li>
+                                <a href="#" class="dropdown-item"
+                                    ><i class="bi bi-person me-2"></i>Profile</a
+                                >
+                            </li>
+                            <li>
+                                <a href="#" class="dropdown-item"
+                                    ><i class="bi bi-gear me-2"></i>Settings</a
+                                >
+                            </li>
+                            <li><hr class="dropdown-divider" /></li>
+                            <li>
+                                <a
+                                    href="Index.html"
+                                    class="dropdown-item text-danger"
+                                    ><i class="bi bi-box-arrow-right me-2"></i
+                                    >Logout</a
+                                >
+                            </li>
+                        </ul>
+                    </div>
+                </div>
+            </nav>
+            <!-- Stats Cards Row - Responsive Fix -->
+            <div class="row g-3 mb-4">
+                <div class="col-sm-6 col-xl-3">
+                    <div
+                        class="stat-card d-flex justify-content-between align-items-center"
+                    >
+                        <div>
+                            <small class="text-muted">Total Revenue</small>
+                            <h3 class="mb-0 fs-2 fs-lg-1">$12,426</h3>
+                            <small class="text-success"
+                                ><i class="bi-arrow-up"></i> +12.5%</small
+                            >
+                        </div>
+                        <div
+                            class="stat-icon bg-primary bg-opacity-10 text-primary"
+                        >
+                            <i class="bi bi-currency-dollar fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div
+                        class="stat-card d-flex justify-content-between align-items-center"
+                    >
+                        <div>
+                            <small class="text-muted">Total Orders</small>
+                            <h3 class="mb-0 fs-2 fs-lg-1">1,432</h3>
+                            <small class="text-success"
+                                ><i class="bi-arrow-up"></i> +8.2%</small
+                            >
+                        </div>
+                        <div
+                            class="stat-icon bg-success bg-opacity-10 text-success"
+                        >
+                            <i class="bi bi-cart fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div
+                        class="stat-card d-flex justify-content-between align-items-center"
+                    >
+                        <div>
+                            <small class="text-muted">Total Customers</small>
+                            <h3 class="mb-0 fs-2 fs-lg-1">5,678</h3>
+                            <small class="text-success"
+                                ><i class="bi-arrow-up"></i> +5.3%</small
+                            >
+                        </div>
+                        <div class="stat-icon bg-info bg-opacity-10 text-info">
+                            <i class="bi bi-people fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+                <div class="col-sm-6 col-xl-3">
+                    <div
+                        class="stat-card d-flex justify-content-between align-items-center"
+                    >
+                        <div>
+                            <small class="text-muted">Pending Orders</small>
+                            <h3 class="mb-0 fs-2 fs-lg-1">23</h3>
+                            <small class="text-danger"
+                                ><i class="bi-arrow-down"></i> -2.1%</small
+                            >
+                        </div>
+                        <div
+                            class="stat-icon bg-warning bg-opacity-10 text-warning"
+                        >
+                            <i class="bi bi-clock-history fs-3"></i>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div
+                class="alert alert-info alert-dismissible fade show"
+                role="alert"
+            >
+                <i class="bi bi-info-circle"></i>
+                <strong class="me-2">Welcome to your dashboard!</strong>Here you
+                can manage all your store operations.
+                <button
+                    class="btn-close"
+                    type="button"
+                    data-bs-dismiss="alert"
+                ></button>
+            </div>
+            <!-- ========== PRODUCTS TABS ========== -->
+            <div class="card shadow-sm mb-4">
+                <div class="card-header bg-white">
+                    <ul class="nav nav-tabs card-header-tabs" role="tablist">
+                        <li class="nav-item" role="presentation">
+                            <button
+                                class="nav-link active"
+                                data-bs-toggle="tab"
+                                data-bs-target="#allProducts"
+                                type="button"
+                                role="tab"
+                            >
+                                All Products
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button
+                                class="nav-link"
+                                data-bs-toggle="tab"
+                                data-bs-target="#electronics"
+                                type="button"
+                                role="tab"
+                            >
+                                Electronics
+                            </button>
+                        </li>
+                        <li class="nav-item" role="presentation">
+                            <button
+                                class="nav-link"
+                                data-bs-toggle="tab"
+                                data-bs-target="#accessories"
+                                type="button"
+                                role="tab"
+                            >
+                                Accessories
+                            </button>
+                        </li>
+                    </ul>
+                </div>
+                <div class="card-body">
+                    <div class="tab-content">
+                        <!-- تب All Products -->
+                        <div class="tab-pane fade show active" id="allProducts">
+                            <div class="row g-3">
+                                <div class="col-6 col-md-4 col-lg-3">
+                                    <div class="product-tab-item">
+                                        <img
+                                            src="Assets/imgs/Wireless Headphones 01.jfif"
+                                            class="product-tab-img"
+                                            alt="Product"
+                                        />
+                                        <div class="product-tab-title">
+                                            Wireless Headphones
+                                        </div>
+                                        <div class="product-tab-sold">
+                                            245 sold
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 col-lg-3">
+                                    <div class="product-tab-item">
+                                        <img
+                                            src="Assets/imgs/Smart Watch 01.jfif"
+                                            class="product-tab-img"
+                                            alt="Product"
+                                        />
+                                        <div class="product-tab-title">
+                                            Smart Watch
+                                        </div>
+                                        <div class="product-tab-sold">
+                                            189 sold
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 col-lg-3">
+                                    <div class="product-tab-item">
+                                        <img
+                                            src="Assets/imgs/Gaming Mouse.jfif"
+                                            class="product-tab-img"
+                                            alt="Product"
+                                        />
+                                        <div class="product-tab-title">
+                                            Gaming Mouse
+                                        </div>
+                                        <div class="product-tab-sold">
+                                            156 sold
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 col-lg-3">
+                                    <div class="product-tab-item">
+                                        <img
+                                            src="Assets/imgs/Laptop Stand.jfif"
+                                            class="product-tab-img"
+                                            alt="Product"
+                                        />
+                                        <div class="product-tab-title">
+                                            Laptop Stand
+                                        </div>
+                                        <div class="product-tab-sold">
+                                            98 sold
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 col-lg-3">
+                                    <div class="product-tab-item">
+                                        <img
+                                            src="Assets/imgs/wireless charger.jfif"
+                                            class="product-tab-img"
+                                            alt="Product"
+                                        />
+                                        <div class="product-tab-title">
+                                            Wireless Charger
+                                        </div>
+                                        <div class="product-tab-sold">
+                                            76 sold
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="electronics">
+                            <div class="row g-3">
+                                <div class="col-6 col-md-4 col-lg-3">
+                                    <div class="product-tab-item">
+                                        <img
+                                            src="Assets/imgs/Smart Watch 01.jfif"
+                                            class="product-tab-img"
+                                            alt="Product"
+                                        />
+                                        <div class="product-tab-title">
+                                            Smart Watch
+                                        </div>
+                                        <div class="product-tab-sold">
+                                            189 sold
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 col-lg-3">
+                                    <div class="product-tab-item">
+                                        <img
+                                            src="Assets/imgs/Gaming Mouse.jfif"
+                                            class="product-tab-img"
+                                            alt="Product"
+                                        />
+                                        <div class="product-tab-title">
+                                            Gaming Mouse
+                                        </div>
+                                        <div class="product-tab-sold">
+                                            156 sold
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="tab-pane fade" id="accessories">
+                            <div class="row g-3">
+                                <div class="col-6 col-md-4 col-lg-3">
+                                    <div class="product-tab-item">
+                                        <img
+                                            src="Assets/imgs/Laptop Stand.jfif"
+                                            class="product-tab-img"
+                                            alt="Product"
+                                        />
+                                        <div class="product-tab-title">
+                                            Laptop Stand
+                                        </div>
+                                        <div class="product-tab-sold">
+                                            98 sold
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-6 col-md-4 col-lg-3">
+                                    <div class="product-tab-item">
+                                        <img
+                                            src="Assets/imgs/wireless charger.jfif"
+                                            class="product-tab-img"
+                                            alt="Product"
+                                        />
+                                        <div class="product-tab-title">
+                                            Wireless Charger
+                                        </div>
+                                        <div class="product-tab-sold">
+                                            76 sold
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- ========== ORDERS TABLE & CHART SECTION ========== -->
+            <div class="row g-4">
+                <!-- جدول سفارشات (سمت چپ - 8 ستون) -->
+                <div class="col-lg-8">
+                    <div class="card shadow-sm">
+                        <div
+                            class="card-header bg-white d-flex justify-content-between align-items-center"
+                        >
+                            <h5 class="mb-0">
+                                <i class="bi bi-truck me-2"></i>Recent Orders
+                            </h5>
+                            <a href="#" class="btn btn-sm btn-outline-primary"
+                                >View All</a
+                            >
+                        </div>
+                        <div class="card-body p-0">
+                            <div class="table-responsive">
+                                <table class="table table-hover mb-0">
+                                    <thead class="table-light">
+                                        <tr>
+                                            <th>Order ID</th>
+                                            <th>Customer</th>
+                                            <th>Product</th>
+                                            <th>Amount</th>
+                                            <th>Status</th>
+                                            <th>Action</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody>
+                                        <tr>
+                                            <td>#ORD-001</td>
+                                            <td>John Smith</td>
+                                            <td>Wireless Headphones</td>
+                                            <td>$49.99</td>
+                                            <td>
+                                                <span class="badge bg-success"
+                                                    >Delivered</span
+                                                >
+                                            </td>
+                                            <td>
+                                                <button
+                                                    class="btn btn-sm btn-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal"
+                                                    onclick="
+                                                        setDeleteOrderId(
+                                                            'ORD-001',
+                                                        )
+                                                    "
+                                                >
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#ORD-002</td>
+                                            <td>Sarah Johnson</td>
+                                            <td>Smart Watch</td>
+                                            <td>$79.99</td>
+                                            <td>
+                                                <span
+                                                    class="badge bg-warning text-dark"
+                                                    >Processing</span
+                                                >
+                                            </td>
+                                            <td>
+                                                <button
+                                                    class="btn btn-sm btn-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal"
+                                                    onclick="
+                                                        setDeleteOrderId(
+                                                            'ORD-002',
+                                                        )
+                                                    "
+                                                >
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#ORD-003</td>
+                                            <td>Mike Wilson</td>
+                                            <td>Gaming Mouse</td>
+                                            <td>$29.99</td>
+                                            <td>
+                                                <span class="badge bg-info"
+                                                    >Shipped</span
+                                                >
+                                            </td>
+                                            <td>
+                                                <button
+                                                    class="btn btn-sm btn-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal"
+                                                    onclick="
+                                                        setDeleteOrderId(
+                                                            'ORD-003',
+                                                        )
+                                                    "
+                                                >
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#ORD-004</td>
+                                            <td>Emily Brown</td>
+                                            <td>Laptop Stand</td>
+                                            <td>$34.99</td>
+                                            <td>
+                                                <span class="badge bg-success"
+                                                    >Delivered</span
+                                                >
+                                            </td>
+                                            <td>
+                                                <button
+                                                    class="btn btn-sm btn-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal"
+                                                    onclick="
+                                                        setDeleteOrderId(
+                                                            'ORD-004',
+                                                        )
+                                                    "
+                                                >
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#ORD-005</td>
+                                            <td>David Lee</td>
+                                            <td>Wireless Charger</td>
+                                            <td>$29.99</td>
+                                            <td>
+                                                <span class="badge bg-danger"
+                                                    >Cancelled</span
+                                                >
+                                            </td>
+                                            <td>
+                                                <button
+                                                    class="btn btn-sm btn-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal"
+                                                    onclick="
+                                                        setDeleteOrderId(
+                                                            'ORD-005',
+                                                        )
+                                                    "
+                                                >
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>#ORD-006</td>
+                                            <td>Lisa Anderson</td>
+                                            <td>Wireless Headphones</td>
+                                            <td>$49.99</td>
+                                            <td>
+                                                <span
+                                                    class="badge bg-warning text-dark"
+                                                    >Processing</span
+                                                >
+                                            </td>
+                                            <td>
+                                                <button
+                                                    class="btn btn-sm btn-danger"
+                                                    data-bs-toggle="modal"
+                                                    data-bs-target="#deleteModal"
+                                                    onclick="
+                                                        setDeleteOrderId(
+                                                            'ORD-006',
+                                                        )
+                                                    "
+                                                >
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </td>
+                                        </tr>
+                                    </tbody>
+                                </table>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <!-- Delete Confirmation Modal -->
+                <div class="modal fade" id="deleteModal" tabindex="-1">
+                    <div class="modal-dialog modal-dialog-centered">
+                        <div class="modal-content">
+                            <div class="modal-header bg-danger text-white">
+                                <h5 class="modal-title">
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                    Confirm Delete
+                                </h5>
+                                <button
+                                    type="button"
+                                    class="btn-close btn-close-white"
+                                    data-bs-dismiss="modal"
+                                ></button>
+                            </div>
+                            <div class="modal-body">
+                                <p>
+                                    Are you sure you want to delete order
+                                    <strong id="DeleteOrderId">#ORD-XXX</strong
+                                    >?
+                                </p>
+                                <p class="text-muted small mb-0">
+                                    This action cannot be undone.
+                                </p>
+                            </div>
+                            <div class="modal-footer">
+                                <button
+                                    class="btn btn-secondary"
+                                    type="button"
+                                    data-bs-dismiss="modal"
+                                >
+                                    Cancel
+                                </button>
+                                <button
+                                    class="btn btn-danger"
+                                    type="button"
+                                    id="confirmDeleteBtn"
+                                >
+                                    Delete Order
+                                </button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Delete Success Toast - موقعیت صحیح در سمت راست -->
+                <div
+                    class="position-fixed bottom-0 start-0 p-3"
+                    style="
+                        z-index: 1060;
+                        margin-bottom: 20px;
+                        margin-right: 20px;
+                    "
+                >
+                    <div
+                        id="deleteToast"
+                        class="toast"
+                        role="alert"
+                        data-bs-autohide="true"
+                        data-bs-delay="2000"
+                    >
+                        <div class="toast-header bg-danger text-white">
+                            <strong class="me-auto"
+                                ><i class="bi bi-check-circle"></i>
+                                Deleted!</strong
+                            >
+                            <button
+                                type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="toast"
+                            ></button>
+                        </div>
+                        <div class="toast-body">
+                            Order has been successfully deleted.
+                        </div>
+                    </div>
+                </div>
+                <!-- Cart Toast - موقعیت صحیح -->
+                <div
+                    class="position-fixed bottom-0 end-0 p-3"
+                    style="
+                        z-index: 1050;
+                        margin-bottom: 80px;
+                        margin-right: 20px;
+                    "
+                >
+                    <div
+                        id="cartToast"
+                        class="toast"
+                        role="alert"
+                        data-bs-autohide="true"
+                        data-bs-delay="2000"
+                    >
+                        <div class="toast-header bg-success text-white">
+                            <strong class="me-auto">
+                                <i class="bi bi-check-circle"></i> Succes!
+                            </strong>
+                            <button
+                                type="button"
+                                class="btn-close btn-close-white"
+                                data-bs-dismiss="toast"
+                            ></button>
+                        </div>
+                        <div class="toast-body">
+                            Item added to cart successfully!
+                        </div>
+                    </div>
+                </div>
+                <!-- نمودار فروش (نسخه بدون Chart.js) -->
+                <div class="col-lg-4">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-graph-up"></i> Sales Overview
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- نمودار ساده با لیست -->
+                            <div class="mb-4">
+                                <div
+                                    class="d-flex justify-content-between mb-2"
+                                >
+                                    <span>Jan</span>
+                                    <strong>$5,200</strong>
+                                </div>
+                                <div class="progress mb-3" style="height: 6px">
+                                    <div
+                                        class="progress-bar bg-primary"
+                                        style="width: 33%"
+                                    ></div>
+                                </div>
+
+                                <div
+                                    class="d-flex justify-content-between mb-2"
+                                >
+                                    <span>Feb</span>
+                                    <strong>$6,100</strong>
+                                </div>
+                                <div class="progress mb-3" style="height: 6px">
+                                    <div
+                                        class="progress-bar bg-primary"
+                                        style="width: 39%"
+                                    ></div>
+                                </div>
+
+                                <div
+                                    class="d-flex justify-content-between mb-2"
+                                >
+                                    <span>Mar</span>
+                                    <strong>$7,800</strong>
+                                </div>
+                                <div class="progress mb-3" style="height: 6px">
+                                    <div
+                                        class="progress-bar bg-primary"
+                                        style="width: 50%"
+                                    ></div>
+                                </div>
+
+                                <div
+                                    class="d-flex justify-content-between mb-2"
+                                >
+                                    <span>Apr</span>
+                                    <strong>$8,200</strong>
+                                </div>
+                                <div class="progress mb-3" style="height: 6px">
+                                    <div
+                                        class="progress-bar bg-primary"
+                                        style="width: 52%"
+                                    ></div>
+                                </div>
+
+                                <div
+                                    class="d-flex justify-content-between mb-2"
+                                >
+                                    <span>May</span>
+                                    <strong>$9,400</strong>
+                                </div>
+                                <div class="progress mb-3" style="height: 6px">
+                                    <div
+                                        class="progress-bar bg-primary"
+                                        style="width: 60%"
+                                    ></div>
+                                </div>
+
+                                <div
+                                    class="d-flex justify-content-between mb-2"
+                                >
+                                    <span>Jun</span>
+                                    <strong>$10,300</strong>
+                                </div>
+                                <div class="progress mb-3" style="height: 6px">
+                                    <div
+                                        class="progress-bar bg-primary"
+                                        style="width: 66%"
+                                    ></div>
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <!-- آمار فروش -->
+                            <div class="mt-3">
+                                <div
+                                    class="d-flex justify-content-between mb-2"
+                                >
+                                    <span>This Week</span>
+                                    <strong>$3,245</strong>
+                                </div>
+                                <!-- Spinner برای بارگذاری -->
+                                <div
+                                    id="loadingSpinner"
+                                    class="text-center mb-3"
+                                    style="display: none"
+                                >
+                                    <div
+                                        class="spinner-border text-primary spinner-border-sm"
+                                        role="status"
+                                    >
+                                        <span class="visually-hidden"
+                                            >Loading...</span
+                                        >
+                                    </div>
+                                    <span class="text-muted ms-2"
+                                        >Updating data...</span
+                                    >
+                                </div>
+                                <div class="progress mb-3" style="height: 8px">
+                                    <div
+                                        class="progress-bar bg-primary"
+                                        style="width: 65%"
+                                    ></div>
+                                </div>
+
+                                <div
+                                    class="d-flex justify-content-between mb-2"
+                                >
+                                    <span>This Month</span>
+                                    <strong>$12,426</strong>
+                                </div>
+                                <div class="progress mb-3" style="height: 8px">
+                                    <div
+                                        class="progress-bar bg-success"
+                                        style="width: 78%"
+                                    ></div>
+                                </div>
+
+                                <div
+                                    class="d-flex justify-content-between mb-2"
+                                >
+                                    <span>This Year</span>
+                                    <strong>$142,890</strong>
+                                </div>
+                                <div class="progress mb-3" style="height: 8px">
+                                    <div
+                                        class="progress-bar bg-info"
+                                        style="width: 45%"
+                                    ></div>
+                                </div>
+                            </div>
+
+                            <hr />
+
+                            <!-- Top Products -->
+                            <h6 class="mb-3">
+                                <i class="bi bi-trophy"></i> Top Products
+                            </h6>
+                            <div
+                                class="d-flex justify-content-between align-items-center mb-2"
+                            >
+                                <span>Wireless Headphones</span>
+                                <span class="badge bg-primary">245 sold</span>
+                            </div>
+                            <div class="progress mb-2" style="height: 4px">
+                                <div
+                                    class="progress-bar bg-primary"
+                                    style="width: 100%"
+                                ></div>
+                            </div>
+
+                            <div
+                                class="d-flex justify-content-between align-items-center mb-2"
+                            >
+                                <span>Smart Watch</span>
+                                <span class="badge bg-primary">189 sold</span>
+                            </div>
+                            <div class="progress mb-2" style="height: 4px">
+                                <div
+                                    class="progress-bar bg-primary"
+                                    style="width: 77%"
+                                ></div>
+                            </div>
+
+                            <div
+                                class="d-flex justify-content-between align-items-center mb-2"
+                            >
+                                <span>Gaming Mouse</span>
+                                <span class="badge bg-primary">156 sold</span>
+                            </div>
+                            <div class="progress mb-2" style="height: 4px">
+                                <div
+                                    class="progress-bar bg-primary"
+                                    style="width: 64%"
+                                ></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- ========== ACTIVITY SECTION ========== -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-white">
+                            <h5 class="mb-0">
+                                <i class="bi bi-activity"></i> Recent Activity
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <!-- فعالیت 1 -->
+                            <div class="timeline-item">
+                                <div
+                                    class="activity-icon bg-success bg-opacity-10 text-success"
+                                >
+                                    <i class="bi bi-check-lg"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <strong>Order #ORD-001 delivered</strong>
+                                    <br />
+                                    <small class="text-muted"
+                                        >2 hours ago</small
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- فعالیت 2 -->
+                            <div class="timeline-item">
+                                <div
+                                    class="activity-icon bg-warning bg-opacity-10 text-warning"
+                                >
+                                    <i class="bi bi-clock"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <strong>New order received #ORD-007</strong>
+                                    <br />
+                                    <small class="text-muted"
+                                        >5 hours ago</small
+                                    >
+                                </div>
+                            </div>
+
+                            <!-- فعالیت 3 -->
+                            <div class="timeline-item">
+                                <div
+                                    class="activity-icon bg-info bg-opacity-10 text-info"
+                                >
+                                    <i class="bi bi-person-plus"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <strong>New customer registered</strong>
+                                    <br />
+                                    <small class="text-muted">Yesterday</small>
+                                </div>
+                            </div>
+
+                            <!-- فعالیت 4 -->
+                            <div class="timeline-item">
+                                <div
+                                    class="activity-icon bg-danger bg-opacity-10 text-danger"
+                                >
+                                    <i class="bi bi-exclamation-triangle"></i>
+                                </div>
+                                <div class="timeline-content">
+                                    <strong
+                                        >Low stock alert: Gaming Mouse</strong
+                                    >
+                                    <br />
+                                    <small class="text-muted">Yesterday</small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!-- end main content -->
+
+        <!-- Bootstrap JS -->
+        <script src="Assets/js/bootstrap.bundle.min.js"></script>
+
+        <script>
+            // Sidebar toggle for mobile
+            const menuToggle = document.getElementById("menu-toggle");
+            const sidebar = document.getElementById("sidebar");
+
+            if (menuToggle) {
+                menuToggle.addEventListener("click", function () {
+                    sidebar.classList.toggle("active");
+                });
+            }
+        </script>
+        <!-- <script>
+            // ========== INITIALIZE SALES CHART ==========
+            // const ctx = document.getElementById("salesChart").getContext("2d");
+
+            const salesChart = new Chart(ctx, {
+                type: "line",
+                data: {
+                    labels: [
+                        "Jan",
+                        "Feb",
+                        "Mar",
+                        "Apr",
+                        "May",
+                        "Jun",
+                        "Jul",
+                        "Aug",
+                        "Sep",
+                        "Oct",
+                        "Nov",
+                        "Dec",
+                    ],
+                    datasets: [
+                        {
+                            label: "Monthly Sales ($)",
+                            data: [
+                                5200, 6100, 7800, 8200, 9400, 10300, 11200,
+                                12426, 11800, 13100, 14200, 15500,
+                            ],
+                            borderColor: "#0d6efd",
+                            backgroundColor: "rgba(13, 110, 253, 0.05)",
+                            borderWidth: 3,
+                            fill: true,
+                            tension: 0.3,
+                            pointBackgroundColor: "#0d6efd",
+                            pointBorderColor: "#fff",
+                            pointBorderWidth: 2,
+                            pointRadius: 4,
+                            pointHoverRadius: 6,
+                        },
+                    ],
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: true,
+                    plugins: {
+                        legend: {
+                            position: "top",
+                        },
+                        tooltip: {
+                            callbacks: {
+                                label: function (context) {
+                                    return "$" + context.raw.toLocaleString();
+                                },
+                            },
+                        },
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            ticks: {
+                                callback: function (value) {
+                                    return "$" + value.toLocaleString();
+                                },
+                            },
+                        },
+                    },
+                },
+            });
+        </script> -->
+        <script>
+            // ========== DELETE ORDER MODAL ==========
+            let currentOrderId = "";
+
+            function setDeleteOrderId(orderId) {
+                currentOrderId = orderId;
+                document.getElementById("deleteOrderId").textContent = orderId;
+            }
+
+            document
+                .getElementById("confirmDeleteBtn")
+                .addEventListener("click", function () {
+                    // حذف ردیف از جدول (در پروژه واقعی باید API فراخوانی شود)
+                    const rows = document.querySelectorAll("tbody tr");
+                    for (let row of rows) {
+                        if (row.cells[0].textContent === currentOrderId) {
+                            row.remove();
+                            break;
+                        }
+                    }
+
+                    // بستن مودال
+                    const modal = bootstrap.Modal.getInstance(
+                        document.getElementById("deleteModal"),
+                    );
+                    modal.hide();
+
+                    // نمایش توست موفقیت
+                    showDeleteToast();
+                });
+
+            function showDeleteToast() {
+                const toastEl = document.getElementById("deleteToast");
+                const toast = new bootstrap.Toast(toastEl);
+                toast.show();
+            }
+        </script>
+        <script>
+            // ========== SPINNER LOADING SIMULATION ==========
+            const spinner = document.getElementById("loadingSpinner");
+
+            if (spinner) {
+                // پیدا کردن هدر Recent Orders و اضافه کردن دکمه
+                const recentOrdersHeader = document.querySelector(
+                    '#ordersTableSection .card-header, .card-header:has(h5:contains("Recent Orders"))',
+                );
+
+                // روش ساده‌تر: پیدا کردن هدر بر اساس متن
+                const allHeaders = document.querySelectorAll(".card-header");
+                let ordersHeader = null;
+
+                for (let header of allHeaders) {
+                    if (header.innerText.includes("Recent Orders")) {
+                        ordersHeader = header;
+                        break;
+                    }
+                }
+
+                if (
+                    ordersHeader &&
+                    !document.getElementById("testSpinnerBtn")
+                ) {
+                    const testBtn = document.createElement("button");
+                    testBtn.id = "testSpinnerBtn";
+                    testBtn.className = "btn btn-sm btn-outline-primary ms-3";
+                    testBtn.innerHTML =
+                        '<i class="bi bi-arrow-repeat"></i> Refresh Data';
+                    testBtn.onclick = function () {
+                        spinner.style.display = "block";
+                        setTimeout(() => {
+                            spinner.style.display = "none";
+                        }, 2000);
+                    };
+                    ordersHeader.appendChild(testBtn);
+                }
+            }
+
+            // برای دکمه View All در جدول سفارشات
+            const viewAllBtn = document.querySelector(
+                ".card-header .btn-outline-primary",
+            );
+            if (viewAllBtn && spinner) {
+                viewAllBtn.addEventListener("click", function (e) {
+                    spinner.style.display = "block";
+                    setTimeout(() => {
+                        spinner.style.display = "none";
+                    }, 1500);
+                });
+            }
+        </script>
+    </body>
+</html>
